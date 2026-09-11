@@ -25,19 +25,16 @@ public class HomeDelivery extends Delivery {
 
     @Override
     public DeliveryType getType() {
-        // TODO 10: დააბრუნე სახლში მიტანის ტიპი.
-        return null;
+        return DeliveryType.HOME;
     }
 
     @Override
     protected boolean canPrepare() {
-        // TODO 11: სახლში მიტანისთვის კურიერი უნდა იყოს დანიშნული.
-        return false;
+        return courierAssigned;
     }
 
     @Override
     protected String getDestinationLabel() {
-        // TODO 12: ზუსტი ფორმატი ნახე README-ში.
-        return "";
+        return "მისამართი: " + address;
     }
 }

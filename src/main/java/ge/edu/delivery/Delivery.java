@@ -20,8 +20,7 @@ public abstract class Delivery implements Trackable {
 
         this.trackingCode = trackingCode;
         this.recipientName = recipientName;
-        // TODO 3: ახალ მიტანას მიანიჭე საწყისი სტატუსი.
-        this.status = null;
+        this.status = DeliveryStatus.CREATED;
     }
 
     public String getTrackingCode() {
@@ -39,38 +38,56 @@ public abstract class Delivery implements Trackable {
 
     /** ამზადებს მიტანას, თუ მისი კონკრეტული ტიპის წინაპირობა შესრულებულია. */
     public boolean prepare() {
-        // TODO 4: ნებადართულია მხოლოდ CREATED მდგომარეობიდან და canPrepare() == true-ისას.
-        return false;
+        if (status != DeliveryStatus.CREATED || !canPrepare()) {
+            return false;
+        }
+
+        status = DeliveryStatus.READY;
+        return true;
     }
 
     /** აგზავნის უკვე მომზადებულ მიტანას გზაში. */
     public boolean dispatch() {
-        // TODO 5: READY მდგომარეობა შეცვალე IN_TRANSIT-ით.
-        return false;
+        if (status != DeliveryStatus.READY) {
+            return false;
+        }
+
+        status = DeliveryStatus.IN_TRANSIT;
+        return true;
     }
 
     /** გზაში მყოფ მიტანას აღნიშნავს ჩაბარებულად. */
     public boolean markDelivered() {
-        // TODO 6: IN_TRANSIT მდგომარეობა შეცვალე DELIVERED-ით.
-        return false;
+        if (status != DeliveryStatus.IN_TRANSIT) {
+            return false;
+        }
+
+        status = DeliveryStatus.DELIVERED;
+        return true;
     }
 
     /** აუქმებს მიტანას მხოლოდ პროცესის დაწყებამდე. */
     public boolean cancel() {
-        // TODO 7: გაუქმება ნებადართულია მხოლოდ CREATED ან READY მდგომარეობაში.
-        return false;
+        if (status != DeliveryStatus.CREATED && status != DeliveryStatus.READY) {
+            return false;
+        }
+
+        status = DeliveryStatus.CANCELLED;
+        return true;
     }
 
     @Override
     public boolean isFinished() {
-        // TODO 8: DELIVERED და CANCELLED საბოლოო მდგომარეობებია.
-        return false;
+        return status == DeliveryStatus.DELIVERED
+                || status == DeliveryStatus.CANCELLED;
     }
 
     @Override
     public String getTrackingMessage() {
-        // TODO 9: ააწყვე README-ში მოთხოვნილი ერთიანი ტექსტი.
-        return "";
+        return trackingCode
+                + " | " + getType()
+                + " | " + status
+                + " | " + getDestinationLabel();
     }
 
     public abstract DeliveryType getType();

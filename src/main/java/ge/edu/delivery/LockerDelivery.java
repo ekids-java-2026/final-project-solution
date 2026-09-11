@@ -25,19 +25,16 @@ public class LockerDelivery extends Delivery {
 
     @Override
     public DeliveryType getType() {
-        // TODO 13: დააბრუნე ლოკერში მიტანის ტიპი.
-        return null;
+        return DeliveryType.LOCKER;
     }
 
     @Override
     protected boolean canPrepare() {
-        // TODO 14: ლოკერში მიტანისთვის უჯრა მზად უნდა იყოს.
-        return false;
+        return compartmentReady;
     }
 
     @Override
     protected String getDestinationLabel() {
-        // მინიშნება: ზუსტი ფორმატი ნახე README-ში და დაასრულე ეს უკანასკნელი override.
-        return "";
+        return "ლოკერი: " + lockerId;
     }
 }
