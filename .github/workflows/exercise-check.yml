@@ -1,0 +1,51 @@
+name: სავარჯიშოს შემოწმება
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "exercise-${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: ტესტები და ანგარიში
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: კოდის ჩამოტვირთვა
+        uses: actions/checkout@v6
+
+      - name: Java 17-ის მომზადება
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+
+      - name: Maven Wrapper-ის მომზადება
+        run: chmod +x mvnw
+
+      - name: ძირითადი ტესტები — 100 ქულა
+        id: required_tests
+        continue-on-error: true
+        run: ./mvnw --batch-mode test
+
+      - name: bonus ტესტი — დამატებითი 10 ქულა
+        continue-on-error: true
+        run: ./mvnw --batch-mode -Pbonus test
+
+      - name: შედეგების მოკლე შეჯამება
+        if: always()
+        run: node scripts/generate-summary.mjs
+
+      - name: ძირითადი ტესტების სტატუსის დაფიქსირება
+        if: always() && steps.required_tests.outcome != 'success'
+        run: |
+          echo "ძირითადი სავარჯიშო ჯერ არ არის დასრულებული. გახსენი Actions Summary დეტალებისთვის."
+          exit 1
